@@ -1,6 +1,8 @@
 var express=require("express");
 var app=express();
 var env=require("dotenv");
+var cors=require("cors")
+app.use(cors())
 var dbservice=require("./services/db.services")
 var router=require("./routes/userroute")
 var mongoose=require("mongoose")

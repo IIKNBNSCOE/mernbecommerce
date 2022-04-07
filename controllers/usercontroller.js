@@ -67,10 +67,10 @@ var login=(req,res)=>
             else
             {
            if(req.body.password === doc.password)
-           res.send({message:"valid user"});
+           res.send({message:"Valid User"});
           //res.send(doc);
            else
-           res.send({message:"invalid user, password dont match"});
+           res.send({message:"Invalid User, Password dont match"});
             }
         }
     })
