@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 var env=require("dotenv");
 const { getMaxListeners } = require("../models/usermodel");
 env.config()
-var sendmail=(req,res)=>
+var sendmail=(req,res,doc,esubject,etext)=>
 {
     let transporter = nodemailer.createTransport({
         host: "smtp.mailtrap.io",
@@ -14,9 +14,9 @@ var sendmail=(req,res)=>
         }})
         message = {
             from: "iktechik50@gmail.com",
-            to: req.body.email,
-            subject: "Notification for Ecommerce application registration",
-            text: `Dear user ${req.body.username}, your account has been created...`
+            to: doc.email,
+            subject: esubject,
+            text: etext
        }
        transporter.sendMail(message, (err, info)=> {
             if (err) {
@@ -25,7 +25,7 @@ var sendmail=(req,res)=>
               console.log(err)
             } else {
               console.log(req.body.email);
-              res.send({message:"Registration is successful"})
+             
             }
         })
     
@@ -43,12 +43,43 @@ var register=(req,res)=>
         }
         else
         {
-            sendmail(req,res);
+            var subject="Notification for Ecommerce application registration"
+            var text=`Dear user ${doc.username} your account has been created with username=${doc.username} and password=${doc.password}`
+            sendmail(req,res,doc,subject,doc);
+            res.send({message:"Registration is successful"})
            // res.send({message:"record inserted"});
             
             
         }
     });
+}
+var fpass=(req,res)=>
+{
+    
+    usermodel.findOne({email:req.body.email},(err,doc)=>
+    {
+        if(err)
+        {
+            res.send({message:"Server Error.. Please try after some time"})
+        }
+        else{
+            if(!doc)
+            {
+                res.send({message:`User does not exists with Email ID `})
+            }
+            else
+            {
+               console.log(doc);
+               //res.send(doc.username);
+              var subject="Regarding password for your account"
+               var text=`Dear user ${doc.username} , password of your account is  ${doc.password}`
+               //res.send({message:"Valid User"});
+               sendmail(req,res,doc,subject,text);
+               res.send({message:`Password has been sent to ${doc.email} `});
+           
+            }
+        }
+    })
 }
 var login=(req,res)=>
 {
@@ -75,4 +106,4 @@ var login=(req,res)=>
         }
     })
 }
-module.exports={register,login}
+module.exports={register,login,fpass}
